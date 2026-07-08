@@ -1,0 +1,18 @@
+name = "QuantumFCSNotebooks"
+authors = ["Aaron Daniel", "Marcelo Janovitch"]
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+QuantumFCS = "f61df7d1-40df-4ff5-bdc9-ea200d60bc8f"
+QuantumOptics = "6e0679c1-51ea-5a7c-ac74-d61b76210b0c"
+
+[sources]
+QuantumFCS = {url = "https://github.com/marcelojbp/QuantumFCS.jl.git", rev = "048abbf9130001310e969f10fafe02fcfc6d3521"}
+
+[compat]
+julia = "1.12"
+

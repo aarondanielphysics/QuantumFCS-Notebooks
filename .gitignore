@@ -1,0 +1,48 @@
+.ipynb_checkpoints/
+*.autosave
+*.nbconvert.ipynb
+*~
+
+# Local editor and OS files.
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and temporary outputs.
+*.log
+logs/
+tmp/
+temp/
+out/
+outputs/
+scratch/
+
+# Julia files that should stay outside this repository.
+.julia/
+artifacts/
+compiled/
+scratchspaces/
+LocalPreferences.toml
+
+# Expensive or local-only benchmark outputs.
+parameter_search/
+raw_outputs/
+data/raw/
+data/machine_info*.toml
+
+# Temporary and component plot files produced while regenerating the final figure.
+figures/tmp/
+figures/*.tmp
+figures/benchmark_compare.*
+figures/benchmark_dense_circuit_qhe_compare.*
+figures/benchmark_linearised_qhe_cumulant_errors.*
+figures/benchmark_dense_circuit_qhe_highest_fock_population_scaled.*
+
+# Wolfram temporary files.
+*.mx
+*.wl~
+*.nb~
+WolframKernel.*
+
