@@ -46,3 +46,5 @@ figures/benchmark_dense_circuit_qhe_highest_fock_population_scaled.*
 *.nb~
 WolframKernel.*
 
+# Agent files 
+AGENTS.md 
