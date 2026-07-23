@@ -45,14 +45,30 @@ x_step = parse_float_env("JC_X_STEP", NaN)
 x_values = (isnan(x_min) || isnan(x_max) || isnan(x_step)) ?
     jc_graded_drive_grid() : collect(x_min:x_step:x_max)
 
-# Representative drives for the Fock-distribution panels of Fig. 2.
-fock_x = parse_float_list_env("JC_FOCK_X", (0.8, 1.0, 1.3))
+# Per-cut σ-headroom. The resonant (Δ=0) cut carries small photon numbers, where
+# the σ-headroom (N−n)/√n that bounds the c₃ truncation bias is smallest, so it
+# gets extra headroom (14σ vs 6σ) — this removes a c₃ artefact and a boundary-
+# tail excursion near 2E/g ≈ 1.25 without changing the detuned cuts.
+pad_sigma_resonant = parse_float_env("JC_PAD_SIGMA_RESONANT", 14.0)
+pad_sigma_detuned  = parse_float_env("JC_PAD_SIGMA", JC_DEFAULT_FCS_PROD_PAD_SIGMA)
+pad_sigma = Δ -> (iszero(Δ) ? pad_sigma_resonant : pad_sigma_detuned)
+
+# Representative Fock-distribution drives per cut: below / at / after that cut's
+# transition (near the Fano peak on the detuned cuts). JC_FOCK_X overrides these
+# with a single shared triple for reduced runs.
+fock_x_per_cut = Dict(0.0 => [0.80, 1.00, 1.30],
+                      0.55 => [0.55, 0.69, 1.10],
+                      0.70 => [0.50, 0.62, 1.00])
+fock_x_override = parse_float_list_env("JC_FOCK_X", Float64[])
+fock_x_for(Δ) = isempty(fock_x_override) ? get(fock_x_per_cut, Δ, [0.80, 1.00, 1.30]) :
+    fock_x_override
 
 println("Driven-dissipative Jaynes-Cummings production sweep")
 println("  g/κ = $g, κ = $κ, nC = $nC")
 println("  detuning cuts Δ/κ = $detuning_cuts")
 println("  drive points: $(length(x_values)) from $(minimum(x_values)) to $(maximum(x_values))")
 println("  cutoff: ", N_override === nothing ? "dynamic schedule" : "forced N = $N_override")
+println("  pad_sigma: resonant $(pad_sigma_resonant), detuned $(pad_sigma_detuned)")
 flush(stdout)
 
 started_at = string(now())
@@ -64,20 +80,26 @@ fcs_rows = run_jc_fcs_production_sweep(;
     g             = g,
     κ             = κ,
     nC            = nC,
+    pad_sigma     = pad_sigma,          # per-cut σ-headroom
     N_override    = N_override,
     verbose       = true)
 
-fock_rows = jc_collect_fock_distributions(;
-    detuning_cuts = detuning_cuts,
-    x_values      = fock_x,
-    g             = g,
-    κ             = κ,
-    verbose       = true)
+# One Fock triple per cut, at that cut's transition, with the sweep's headroom.
+fock_rows = reduce(vcat, [
+    jc_collect_fock_distributions(;
+        detuning_cuts = [Δ],
+        x_values      = fock_x_for(Δ),
+        g             = g,
+        κ             = κ,
+        pad_sigma     = pad_sigma,
+        verbose       = true)
+    for Δ in detuning_cuts])
 
 schedules = Dict{Float64,Any}()
 if N_override === nothing
     for Δ in detuning_cuts
         schedules[Δ] = jc_dynamic_cutoff_schedule(x_values, Δ; g = g, κ = κ,
+                                                  pad_sigma = pad_sigma(Δ),
                                                   return_detail = true)
     end
 end
@@ -106,7 +128,7 @@ CSV.write(csv_path, DataFrame(fcs_rows))
 config = (; g, κ, nC, x_values, detuning_cuts,
             tiers = JC_DEFAULT_FCS_PROD_TIERS,
             occ_max = JC_DEFAULT_FCS_PROD_OCC_MAX,
-            pad_sigma = JC_DEFAULT_FCS_PROD_PAD_SIGMA,
+            pad_sigma = pad_sigma,
             pad_abs = JC_DEFAULT_FCS_PROD_PAD_ABS,
             ilu_tau = JC_DEFAULT_SCOUT_SS_ILU_TAU,
             shift_factor = JC_DEFAULT_SS_ILU_SHIFT_FACTOR,
