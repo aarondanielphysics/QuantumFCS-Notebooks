@@ -1502,3 +1502,121 @@ function jc_fcs_production_plot(rows, detuning_cuts, metadata;
     colgap!(fig.layout, 24)
     return fig
 end
+
+# ---------------------------------------------------------------------------
+# Manuscript figure wrappers
+#
+# These reproduce the published figures exactly: the styling keywords below are
+# the ones used to generate the PDFs in the manuscript. A notebook section ends
+# by calling the matching wrapper, so the presentation-oriented intermediate
+# plots stay simple and only the final call is publication-styled.
+# ---------------------------------------------------------------------------
+
+"""
+    jc_paper_figure(rows, detuning_cuts, fock_distributions; g, κ=1.0) -> Figure
+
+Manuscript Fig. 2: driven-dissipative Jaynes-Cummings production FCS sweep.
+`rows` and `fock_distributions` come from `run_jc_fcs_production_sweep` /
+`jc_collect_fock_distributions` (or `load_jc_production`).
+"""
+function jc_paper_figure(rows, detuning_cuts, fock_distributions; g, κ=1.0,
+        metadata=nothing)
+    return jc_fcs_production_plot(rows, detuning_cuts, metadata;
+        fock_distributions=fock_distributions,
+        g=g,
+        figure_size=(2600, 1400),
+        fontsize=30,
+        κ=κ,
+        trunc_tol=1e-5,
+        pn_floor=0.001e-5,
+        pn_xlims=(0, 400))
+end
+
+"""
+    qhe_antibunching_paper_figure(g_data, lambda_data) -> Figure
+
+Manuscript Fig. 3: heat-engine antibunching regime (g sweep and λ_c sweep).
+"""
+function qhe_antibunching_paper_figure(g_data, lambda_data)
+    return qhe_two_sweep_regime_plot(g_data, lambda_data;
+        g_xlabel=L"g/\sqrt{\kappa_h \kappa_c}",
+        lambda_xlabel=L"\lambda_c",
+        show_poisson=true,
+        linewidth=4,
+        fontsize=25,
+        panel_label_fontsize=28,
+        xlabelsize=30,
+        ylabelsize=30,
+        figure_size=(1650, 1180),
+        current_legend_position=:lb,
+        hot_fano_legend_position=:rt,
+        cold_fano_legend_position=:rt)
+end
+
+"""
+    qhe_antibunching_validation_figure(g_data, lambda_data) -> Figure
+
+Validation appendix figure for the antibunching regime: off-resonant estimate,
+cutoff tails, and occupation fractions.
+"""
+function qhe_antibunching_validation_figure(g_data, lambda_data)
+    return qhe_two_sweep_validation_plot(g_data, lambda_data;
+        g_xlabel=L"g/\sqrt{\kappa_h \kappa_c}",
+        lambda_xlabel=L"\lambda_c",
+        tail_tol=5e-3,
+        linewidth=4,
+        fontsize=25,
+        panel_label_fontsize=28,
+        xlabelsize=30,
+        ylabelsize=30,
+        figure_size=(1650, 1120),
+        occupation_tol=0.5,
+        mark_bad_points=false,
+        epsilon_legend_position=:rb,
+        tail_legend_position=:rc,
+        occupation_legend_position=:rt)
+end
+
+"""
+    qhe_finite_affinity_paper_figure(g_data, lambda_data) -> Figure
+
+Manuscript Fig. 4: heat-engine finite-affinity regime approaching the TUR bound.
+"""
+function qhe_finite_affinity_paper_figure(g_data, lambda_data)
+    return qhe_two_sweep_regime_plot(g_data, lambda_data;
+        g_xlabel=L"g/\sqrt{\kappa_h \kappa_c}",
+        lambda_xlabel=L"\lambda_c",
+        show_poisson=false,
+        linewidth=4,
+        fontsize=25,
+        panel_label_fontsize=28,
+        xlabelsize=30,
+        ylabelsize=30,
+        figure_size=(1650, 1180),
+        current_legend_position=:lb,
+        hot_fano_legend_position=:rc,
+        cold_fano_legend_position=:rc)
+end
+
+"""
+    qhe_finite_affinity_validation_figure(g_data, lambda_data) -> Figure
+
+Validation appendix figure for the finite-affinity regime.
+"""
+function qhe_finite_affinity_validation_figure(g_data, lambda_data)
+    return qhe_two_sweep_validation_plot(g_data, lambda_data;
+        g_xlabel=L"g/\sqrt{\kappa_h \kappa_c}",
+        lambda_xlabel=L"\lambda_c",
+        tail_tol=3e-3,
+        linewidth=4,
+        fontsize=25,
+        panel_label_fontsize=28,
+        xlabelsize=30,
+        ylabelsize=30,
+        figure_size=(1650, 1120),
+        occupation_tol=0.5,
+        mark_bad_points=false,
+        epsilon_legend_position=:rb,
+        tail_legend_position=:lc,
+        occupation_legend_position=:rt)
+end
