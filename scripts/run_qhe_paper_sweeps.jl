@@ -12,16 +12,17 @@
 # Subsets and reduced grids:
 #   QHE_SWEEPS="antibunching_g" QHE_POINTS=25 julia --project=. scripts/run_qhe_paper_sweeps.jl
 
-const PROJECT_ROOT = normpath(joinpath(@__DIR__, ".."))
+using DrWatson
+@quickactivate "QuantumFCSNotebooks"
 
 using CSV
 using DataFrames
 using JLD2
 using Printf
 
-include(joinpath(PROJECT_ROOT, "src", "qhe_model.jl"))
-include(joinpath(PROJECT_ROOT, "src", "config.jl"))
-include(joinpath(PROJECT_ROOT, "src", "data_io.jl"))
+include(srcdir("qhe_model.jl"))
+include(srcdir("config.jl"))
+include(srcdir("data_io.jl"))
 
 const ANTIBUNCHING = (; lambda_h = 0.47, Omega_c = 1000.0, Omega_ratio = π,
                         kappa_h = 2.0, kappa_c = 0.5, n_h = 0.5, n_c = 0.01,

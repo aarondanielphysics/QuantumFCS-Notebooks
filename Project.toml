@@ -6,6 +6,7 @@ BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 HypergeometricFunctions = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 IncompleteLU = "40713840-3770-5561-ab4c-a76e7d0d7895"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
@@ -21,8 +22,7 @@ QuantumToolbox = "6c2fb7c5-b903-41d2-bc5e-5a7c320b9fab"
 # steady-state + prepared-FCS-context + Pl-injection API, which currently lives
 # only on the `feature/trace-constrained-steadystate` branch of QuantumFCS.jl.
 # Re-pin to a stable tag/commit once those branches are merged into `main`.
-QuantumFCS = {url = "https://github.com/marcelojbp/QuantumFCS.jl.git", rev = "9c2ea702b1ad56daf546d3da056ffb5679b2e814"}
+QuantumFCS = {rev = "9c2ea702b1ad56daf546d3da056ffb5679b2e814", url = "https://github.com/marcelojbp/QuantumFCS.jl.git"}
 
 [compat]
 julia = "1.12"
-

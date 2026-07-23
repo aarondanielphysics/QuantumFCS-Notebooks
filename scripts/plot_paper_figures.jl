@@ -6,18 +6,19 @@
 # Run:  julia --project=. scripts/plot_paper_figures.jl
 #       make paper-figures
 
-const PROJECT_ROOT = normpath(joinpath(@__DIR__, ".."))
+using DrWatson
+@quickactivate "QuantumFCSNotebooks"
 
 using CairoMakie
 using DataFrames
 using JLD2
 using LaTeXStrings
 
-include(joinpath(PROJECT_ROOT, "src", "data_io.jl"))
-include(joinpath(PROJECT_ROOT, "src", "paper_figures.jl"))
+include(srcdir("data_io.jl"))
+include(srcdir("paper_figures.jl"))
 
 CairoMakie.activate!(type = "png")
-figures = joinpath(PROJECT_ROOT, "figures")
+figures = projectdir("figures")
 mkpath(figures)
 
 function save_both(fig, name)

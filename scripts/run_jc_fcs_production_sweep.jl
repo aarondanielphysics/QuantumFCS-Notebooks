@@ -14,15 +14,16 @@
 #   JC_DETUNINGS="0.0" JC_X_MIN=0.4 JC_X_MAX=0.6 JC_X_STEP=0.05 JC_N_OVERRIDE=40 \
 #       julia --project=. scripts/run_jc_fcs_production_sweep.jl
 
-const PROJECT_ROOT = normpath(joinpath(@__DIR__, ".."))
+using DrWatson
+@quickactivate "QuantumFCSNotebooks"
 
 using CSV
 using DataFrames
 using Dates
 using JLD2
 
-include(joinpath(PROJECT_ROOT, "src", "jc_model.jl"))
-include(joinpath(PROJECT_ROOT, "src", "config.jl"))
+include(srcdir("jc_model.jl"))
+include(srcdir("config.jl"))
 
 parse_float_list_env(name, default) = begin
     value = get(ENV, name, "")
@@ -86,7 +87,7 @@ finished_at = string(now())
 
 # Reduced runs should not clobber the checked-in production dataset: point
 # JC_OUTPUT_DIR somewhere else when running a smoke check.
-output_dir = get(ENV, "JC_OUTPUT_DIR", joinpath(PROJECT_ROOT, "data"))
+output_dir = get(ENV, "JC_OUTPUT_DIR", datadir())
 mkpath(output_dir)
 
 results_path  = joinpath(output_dir, "jc_fcs_production_g14_results.jld2")

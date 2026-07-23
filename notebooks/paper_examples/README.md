@@ -18,7 +18,10 @@ Model construction and the publication plotting live in `src/`
 (`jc_model.jl`, `qhe_model.jl`, `paper_figures.jl`); the sweep setup and the
 QuantumFCS calls are deliberately in the notebooks.
 
-Run from the repository root with the checked-in environment:
+Each notebook activates this repository's environment itself via DrWatson
+(`@quickactivate "QuantumFCSNotebooks"` in the first cell) and locates its
+sources with `srcdir`/`datadir`, so it does not matter which project your editor
+has selected. Instantiate once:
 
 ```sh
 julia --project=. -e 'using Pkg; Pkg.instantiate()'

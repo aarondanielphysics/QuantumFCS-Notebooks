@@ -42,6 +42,13 @@ published figure.
 
 ## Reproducing the paper applications
 
+The notebooks use [DrWatson](https://juliadynamics.github.io/DrWatson.jl/) to
+orchestrate the environment: the first cell calls `@quickactivate
+"QuantumFCSNotebooks"`, which walks up from the notebook's own location, activates
+this repository's project, and makes `srcdir`/`datadir`/`projectdir` resolve here.
+Nothing depends on which environment your editor happens to have selected, so
+opening a notebook with another project active still works.
+
 Everything below runs from the repository root with the checked-in environment.
 
 ```sh
