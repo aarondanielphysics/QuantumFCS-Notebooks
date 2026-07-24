@@ -26,7 +26,8 @@ DENSE_NBAR_C ?= 0.05
 .PHONY: help instantiate benchmark all machine-info benchmarks julia-benchmarks \
 	mathematica-benchmarks melt-benchmarks plots linearised-benchmark \
 	dense-benchmark melt-linearised-benchmark melt-dense-benchmark \
-	linearised-plot dense-plot smoke clean-generated-plots
+	linearised-plot dense-plot smoke clean-generated-plots \
+	test paper-figures jc-production qhe-sweeps paper-applications
 
 help:
 	@echo "Benchmark targets:"
@@ -41,6 +42,17 @@ help:
 	@echo "  make dense-benchmark       run only the dense Julia benchmark"
 	@echo "  make melt-linearised-benchmark run only the linearised MELT script"
 	@echo "  make melt-dense-benchmark  run only the dense MELT script"
+	@echo ""
+	@echo "Paper-application targets (Secs. 4 and 5):"
+	@echo "  make test                  run the regression and parity test suite (~80 s)"
+	@echo "  make paper-figures         regenerate Figs. 2-4 from checked-in data (no sweeps)"
+	@echo "  make qhe-sweeps            recompute the heat-engine sweeps (~9 min)"
+	@echo "  make jc-production         recompute the full Jaynes-Cummings sweep (~1 hour)"
+	@echo "  make paper-applications    qhe-sweeps + jc-production + paper-figures"
+	@echo ""
+	@echo "  Reduced runs, e.g.:"
+	@echo "    make qhe-sweeps QHE_SWEEPS=antibunching_g QHE_POINTS=25"
+	@echo "    make jc-production JC_DETUNINGS=0.0 JC_X_MIN=0.4 JC_X_MAX=0.6 JC_X_STEP=0.05 JC_N_OVERRIDE=40"
 
 all: benchmark
 
@@ -107,6 +119,25 @@ linearised-plot:
 
 dense-plot:
 	$(JULIA) $(JULIA_FLAGS) scripts/plot_dense_circuit_qhe_comparison.jl
+
+# --- Paper applications (manuscript Secs. 4 and 5) --------------------------
+# Sweep sizes are controlled by environment variables read inside the scripts:
+#   QHE_SWEEPS, QHE_POINTS
+#   JC_DETUNINGS, JC_X_MIN, JC_X_MAX, JC_X_STEP, JC_N_OVERRIDE, JC_G, JC_NC
+
+test:
+	$(JULIA) $(JULIA_FLAGS) test/runtests.jl
+
+paper-figures:
+	$(JULIA) $(JULIA_FLAGS) scripts/plot_paper_figures.jl
+
+qhe-sweeps:
+	$(JULIA) $(JULIA_FLAGS) scripts/run_qhe_paper_sweeps.jl
+
+jc-production:
+	$(JULIA) $(JULIA_FLAGS) scripts/run_jc_fcs_production_sweep.jl
+
+paper-applications: qhe-sweeps jc-production paper-figures
 
 clean-generated-plots:
 	$(RM) figures/benchmark_compare.png figures/benchmark_compare.pdf

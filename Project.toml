@@ -6,13 +6,23 @@ BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
+HypergeometricFunctions = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
+IncompleteLU = "40713840-3770-5561-ab4c-a76e7d0d7895"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+LinearSolve = "7ed4a6bd-45f5-4d41-b270-4a48e9bafcae"
 QuantumFCS = "f61df7d1-40df-4ff5-bdc9-ea200d60bc8f"
 QuantumOptics = "6e0679c1-51ea-5a7c-ac74-d61b76210b0c"
+QuantumToolbox = "6c2fb7c5-b903-41d2-bc5e-5a7c320b9fab"
 
 [sources]
-QuantumFCS = {url = "https://github.com/marcelojbp/QuantumFCS.jl.git", rev = "048abbf9130001310e969f10fafe02fcfc6d3521"}
+# NOTE: temporary pin. The JC/QHE paper examples require the trace-constrained
+# steady-state + prepared-FCS-context + Pl-injection API, which currently lives
+# only on the `feature/trace-constrained-steadystate` branch of QuantumFCS.jl.
+# Re-pin to a stable tag/commit once those branches are merged into `main`.
+QuantumFCS = {rev = "9c2ea702b1ad56daf546d3da056ffb5679b2e814", url = "https://github.com/marcelojbp/QuantumFCS.jl.git"}
 
 [compat]
 julia = "1.12"
-

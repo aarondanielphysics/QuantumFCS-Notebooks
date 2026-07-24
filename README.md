@@ -5,27 +5,90 @@ This repository accompanies an in-progress companion paper for
 collect the reproducible notebooks, scripts, processed data, and figures used in
 the publication.
 
-The repository currently contains the benchmark workflow for the manuscript
-summary figure. Future additions will include notebooks for the paper examples
-and a usage-example notebook that demonstrates the main QuantumFCS.jl workflow
-from the text.
-
 Citation information and final paper metadata will be added after publication.
+
+## What is here
+
+| Manuscript | Notebook | Figure |
+|---|---|---|
+| Sec. 3.2 — minimal quantum dot | [`notebooks/usage_examples/minimal_quantum_dot_example.ipynb`](notebooks/usage_examples/minimal_quantum_dot_example.ipynb) | — |
+| Sec. 4 — driven-dissipative Jaynes-Cummings | [`notebooks/paper_examples/driven_dissipative_jaynes_cummings.ipynb`](notebooks/paper_examples/driven_dissipative_jaynes_cummings.ipynb) | Fig. 2 |
+| Sec. 5 — circuit-QED heat engine | [`notebooks/paper_examples/circuit_qed_heat_engine.ipynb`](notebooks/paper_examples/circuit_qed_heat_engine.ipynb) | Figs. 3, 4 |
+| Sec. 6 — benchmark against MELT | `scripts/` + `make benchmark` | Fig. 5 |
+
+Both paper-example notebooks are written to be read alongside the manuscript:
+they show how the sweeps are set up and driven through the QuantumFCS API — how
+the trace-constrained steady state is solved, how one incomplete-LU
+factorization is reused across parameter points and handed to the FCS Drazin
+solve, and which identities each point is checked against — and then rebuild the
+published figure.
 
 ## Repository Layout
 
-- `notebooks/`: publication companion notebooks. Use this for worked examples,
-  usage walkthroughs, and narrative reproductions of paper results.
-- `notebooks/paper_examples/`: notebooks for individual examples developed for
-  the paper.
-- `notebooks/usage_examples/`: notebooks focused on package usage from the
-  manuscript.
-- `src/`: reusable Julia helpers for models, benchmark runs, paths, and plots.
-- `scripts/`: Julia and WolframScript entry points used by reproducible
-  workflows.
-- `data/`: small checked-in CSV outputs used to regenerate figures.
-- `figures/`: checked-in final figure outputs.
+- `notebooks/paper_examples/`: notebooks reproducing the paper applications.
+- `notebooks/usage_examples/`: notebooks focused on package usage from the text.
+- `src/`: Julia helpers.
+  - `jc_model.jl`, `qhe_model.jl`: the two paper-application pipelines.
+  - `jc_diagnostics.jl`: Jaynes-Cummings truncation-reliability studies.
+  - `paper_figures.jl`: the exact routines producing the manuscript figures.
+  - `data_io.jl`: loaders for the checked-in datasets.
+  - `models.jl`, `benchmarks.jl`, `plots.jl`, `paths.jl`, `config.jl`: benchmark half.
+- `scripts/`: Julia and WolframScript entry points used by reproducible workflows.
+- `data/`: checked-in datasets — benchmark CSVs, the Jaynes-Cummings production
+  sweep, and the heat-engine sweeps under `data/qhe_paper_sweeps/`.
+- `test/`: regression and parity suite (`make test`).
+- `figures/`: checked-in figure outputs.
 - `melt.m`: local MELT copy used for offline WolframScript benchmark reruns.
+
+## Reproducing the paper applications
+
+The notebooks use [DrWatson](https://juliadynamics.github.io/DrWatson.jl/) to
+orchestrate the environment: the first cell calls `@quickactivate
+"QuantumFCSNotebooks"`, which walks up from the notebook's own location, activates
+this repository's project, and makes `srcdir`/`datadir`/`projectdir` resolve here.
+Nothing depends on which environment your editor happens to have selected, so
+opening a notebook with another project active still works.
+
+Everything below runs from the repository root with the checked-in environment.
+
+```sh
+make test            # regression + parity suite (~80 s)
+make paper-figures   # rebuild Figs. 2-4 from checked-in data, no sweeps
+```
+
+The notebooks default to the checked-in data for the expensive parts and
+recompute the rest live. To recompute the sweeps from scratch:
+
+```sh
+make qhe-sweeps      # heat-engine sweeps (~9 minutes)
+make jc-production   # full Jaynes-Cummings sweep (~1 hour, several GB)
+```
+
+Inside the notebooks the same choice is a toggle: `RUN_FULL_JC` in the
+Jaynes-Cummings notebook and `RUN_FINITE_AFFINITY_LIVE` in the heat-engine
+notebook. The heat-engine antibunching sweeps always run live (about 15
+seconds); only the 546-dimensional finite-affinity sweeps are gated.
+
+Reduced runs for a quick check — these write elsewhere so they cannot overwrite
+the checked-in datasets:
+
+```sh
+make qhe-sweeps QHE_SWEEPS=antibunching_g QHE_POINTS=25 QHE_OUTPUT_DIR=/tmp/qhe
+```
+
+### Cost and reliability at a glance
+
+| Sweep | Hilbert dim | Points | Cost |
+|---|---|---|---|
+| JC production (3 detuning cuts) | up to 1002 (Fock cutoff 150–500) | 267 | ~1 hour |
+| Heat engine, antibunching | 64 and 88 | 500 + 100 | ~15 s |
+| Heat engine, finite affinity | 546 | 50 + 50 | ~8 min |
+
+Every Jaynes-Cummings point is gated on the identity
+`c₁ = κ⟨a†a⟩`; every heat-engine point is checked against tight coupling and
+against currents computed directly from the steady state. The notebooks report
+these, along with the truncation and rotating-wave diagnostics that appear in
+the manuscript.
 
 ## Julia Environment
 
@@ -38,6 +101,14 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'
 The manifest was generated for Julia `1.12.6`. `Project.toml` points
 `QuantumFCS` at the public GitHub repository and pins the commit used for the
 current reproducible artifacts.
+
+> **Note on the QuantumFCS pin.** The paper-example notebooks use the
+> trace-constrained steady-state API (`trace_constrained_steadystate`,
+> `prepare_fcs_context`, and preconditioner injection via `Pl`). That API is not
+> yet on `main` of QuantumFCS.jl, so `Project.toml` currently pins the
+> `feature/trace-constrained-steadystate` commit that produced the checked-in
+> data. This pin should be moved to a tagged release once those changes are
+> merged.
 
 ## Notebook Contributions
 
